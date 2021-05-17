@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:my_recipes/components/collectionItem.dart';
-import 'package:my_recipes/components/collectionItemOverlay.dart';
 import 'package:my_recipes/components/tagsList.dart';
 import 'package:my_recipes/dtos/recipeDTO.dart';
+import 'package:my_recipes/pages/recipePage.dart';
 
 import '../ApiService.dart';
 
@@ -16,7 +16,6 @@ class CollectionPage extends StatefulWidget {
 
 class _CollectionPageState extends State<CollectionPage> {
   List<RecipeDTO> allRecipes = [];
-  RecipeDTO selectedRecipe;
   Set<String> selectedTags = Set.identity();
   Set<String> allTags = Set.identity();
 
@@ -38,12 +37,6 @@ class _CollectionPageState extends State<CollectionPage> {
                 .reduce((value, element) => value + element)
                 .toSet();
       });
-    });
-  }
-
-  void clearSelectedRecipe() {
-    this.setState(() {
-      this.selectedRecipe = null;
     });
   }
 
@@ -78,62 +71,54 @@ class _CollectionPageState extends State<CollectionPage> {
     return Scaffold(
         backgroundColor: colorScheme.background,
         body: Center(
-          child: Stack(children: [
-            Padding(
-                padding: const EdgeInsets.fromLTRB(spacing, 15, spacing, 10),
-                child: Column(
-                  children: [
+          child: Padding(
+              padding: const EdgeInsets.fromLTRB(spacing, 15, spacing, 10),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 18,
+                    ),
+                    child: Text("my recipes", style: localTheme.headline2),
+                  ),
+                  Row(children: [
                     Padding(
                       padding: const EdgeInsets.only(
-                        bottom: 18,
-                      ),
-                      child: Text("my recipes", style: localTheme.headline2),
+                          top: lineSize / 2, bottom: lineSize / 2),
+                      child: CustomPaint(
+                          painter: DrawHorizontalLine(
+                              colorScheme.primary, lineSize)),
                     ),
-                    Row(children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            top: lineSize / 2, bottom: lineSize / 2),
-                        child: CustomPaint(
-                            painter: DrawHorizontalLine(
-                                colorScheme.primary, lineSize)),
-                      ),
-                    ]),
-                    TagsList(
-                        this.allTags.toList(),
-                        (String r) => toggleSelectTag(r),
-                        this.selectedTags.toList()),
-                    new Expanded(
-                        child: new ListView(shrinkWrap: true, children: [
-                      StaggeredGridView.countBuilder(
-                        physics: ScrollPhysics(),
-                        shrinkWrap: true,
-                        crossAxisCount: 4,
-                        itemCount: showingRecipes.length,
-                        itemBuilder: (BuildContext context, int index) =>
-                            Container(
-                                child: CollectionItem(showingRecipes[index],
-                                    (recipe) {
-                          this.setState(() {
-                            this.selectedRecipe = recipe;
-                          });
-                        }, () {
-                          this.setState(() {
-                            this.selectedRecipe = null;
-                          });
-                        })),
-                        staggeredTileBuilder: (int index) =>
-                            new StaggeredTile.fit(2),
-                        mainAxisSpacing: spacing,
-                        crossAxisSpacing: spacing,
-                      )
-                    ]))
-                  ],
-                )),
-            this.selectedRecipe != null
-                ? CollectionItemOverlay(
-                    this.selectedRecipe, clearSelectedRecipe)
-                : Container(),
-          ]),
+                  ]),
+                  TagsList(
+                      this.allTags.toList(),
+                      (String r) => toggleSelectTag(r),
+                      this.selectedTags.toList()),
+                  new Expanded(
+                      child: new ListView(shrinkWrap: true, children: [
+                    StaggeredGridView.countBuilder(
+                      physics: ScrollPhysics(),
+                      shrinkWrap: true,
+                      crossAxisCount: 4,
+                      itemCount: showingRecipes.length,
+                      itemBuilder: (BuildContext context, int index) =>
+                          Container(
+                              child: CollectionItem(showingRecipes[index],
+                                  (recipe) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RecipePage(recipe)),
+                        );
+                      })),
+                      staggeredTileBuilder: (int index) =>
+                          new StaggeredTile.fit(2),
+                      mainAxisSpacing: spacing,
+                      crossAxisSpacing: spacing,
+                    )
+                  ]))
+                ],
+              )),
         ));
   }
 }

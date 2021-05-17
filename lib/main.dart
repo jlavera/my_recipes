@@ -49,7 +49,12 @@ class MyApp extends StatelessWidget {
                 color: colorScheme.primary),
             subtitle1: TextStyle(
                 fontSize: 12, fontWeight: FontWeight.w300, color: Colors.grey),
-            bodyText1: TextStyle(fontSize: 14.0)),
+            subtitle2: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.w300, color: Colors.grey),
+            bodyText1: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w400,
+                color: Colors.black54)),
         primaryColor: colorScheme.primary,
         accentColor: colorScheme.secondary,
         backgroundColor: colorScheme.background,
