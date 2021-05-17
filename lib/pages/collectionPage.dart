@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:my_recipes/components/collectionItem.dart';
 import 'package:my_recipes/components/collectionItemOverlay.dart';
+import 'package:my_recipes/components/tagsList.dart';
 import 'package:my_recipes/dtos/recipeDTO.dart';
 
 import '../ApiService.dart';
@@ -15,6 +17,8 @@ class CollectionPage extends StatefulWidget {
 class _CollectionPageState extends State<CollectionPage> {
   List<RecipeDTO> allRecipes = [];
   RecipeDTO selectedRecipe;
+  Set<String> selectedTags = Set.identity();
+  Set<String> allTags = Set.identity();
 
   @override
   void initState() {
@@ -26,6 +30,13 @@ class _CollectionPageState extends State<CollectionPage> {
     ApiService.getRecipes().then((recipes) async {
       setState(() {
         this.allRecipes = recipes;
+        this.allTags = this.allRecipes.isEmpty
+            ? List.empty()
+            : this
+                .allRecipes
+                .map((e) => e.tags.map((t) => t.toUpperCase()).toList())
+                .reduce((value, element) => value + element)
+                .toSet();
       });
     });
   }
@@ -36,12 +47,33 @@ class _CollectionPageState extends State<CollectionPage> {
     });
   }
 
+  void toggleSelectTag(String tag) {
+    if (selectedTags.contains(tag)) {
+      this.setState(() {
+        selectedTags.remove(tag);
+      });
+    } else {
+      this.setState(() {
+        selectedTags.add(tag);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    var localTheme = Theme.of(context).textTheme;
+    final localTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    const lineSize = 10.0;
+    const lineSize = 5.0;
     const spacing = 4.0;
+
+    var showingRecipes = this.selectedTags.isEmpty
+        ? this.allRecipes
+        : this
+            .allRecipes
+            .where((recipe) => recipe.tags.any((recipeTag) => this
+                .selectedTags
+                .any((selectedTag) => selectedTag == recipeTag.toUpperCase())))
+            .toList();
 
     return Scaffold(
         backgroundColor: colorScheme.background,
@@ -60,30 +92,41 @@ class _CollectionPageState extends State<CollectionPage> {
                     Row(children: [
                       Padding(
                         padding: const EdgeInsets.only(
-                            top: lineSize / 2, bottom: lineSize / 2 + spacing),
+                            top: lineSize / 2, bottom: lineSize / 2),
                         child: CustomPaint(
                             painter: DrawHorizontalLine(
                                 colorScheme.primary, lineSize)),
                       ),
                     ]),
-                    GridView.count(
-                        crossAxisCount: 3,
-                        childAspectRatio: 1.0,
+                    TagsList(
+                        this.allTags.toList(),
+                        (String r) => toggleSelectTag(r),
+                        this.selectedTags.toList()),
+                    new Expanded(
+                        child: new ListView(shrinkWrap: true, children: [
+                      StaggeredGridView.countBuilder(
+                        physics: ScrollPhysics(),
+                        shrinkWrap: true,
+                        crossAxisCount: 4,
+                        itemCount: showingRecipes.length,
+                        itemBuilder: (BuildContext context, int index) =>
+                            Container(
+                                child: CollectionItem(showingRecipes[index],
+                                    (recipe) {
+                          this.setState(() {
+                            this.selectedRecipe = recipe;
+                          });
+                        }, () {
+                          this.setState(() {
+                            this.selectedRecipe = null;
+                          });
+                        })),
+                        staggeredTileBuilder: (int index) =>
+                            new StaggeredTile.fit(2),
                         mainAxisSpacing: spacing,
                         crossAxisSpacing: spacing,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: this.allRecipes.map((recipe) {
-                          return CollectionItem(recipe, (recipe) {
-                            this.setState(() {
-                              this.selectedRecipe = recipe;
-                            });
-                          }, () {
-                            this.setState(() {
-                              this.selectedRecipe = null;
-                            });
-                          });
-                        }).toList())
+                      )
+                    ]))
                   ],
                 )),
             this.selectedRecipe != null

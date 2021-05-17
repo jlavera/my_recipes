@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_recipes/components/IngredientsList.dart';
-import 'package:my_recipes/components/StepsList.dart';
+import 'package:my_recipes/components/stepsList.dart';
 import 'package:my_recipes/dtos/recipeDTO.dart';
 
 class RecipePage extends StatelessWidget {

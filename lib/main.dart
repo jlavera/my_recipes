@@ -1,5 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:my_recipes/pages/loadingPage.dart';
 
 import 'pages/collectionPage.dart';
 
@@ -12,7 +14,7 @@ const colorScheme = ColorScheme(
     primaryVariant: Color(0xCCFFFFFF),
     secondary: Color(0xFF794FFF),
     secondaryVariant: Color(0xFFE42C64),
-    background: Color(0xFF1B1E21),
+    background: Colors.white,
     surface: Color(0xFF2F333C),
     error: Color.fromRGBO(255, 0, 0, 1),
     onPrimary: Color(0xFF614AD3),
@@ -23,11 +25,7 @@ const colorScheme = ColorScheme(
     brightness: Brightness.dark);
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
-
+  Widget buildAppContainer(Widget child) {
     return MaterialApp(
       title: 'My Recipes',
       theme: ThemeData(
@@ -45,13 +43,40 @@ class MyApp extends StatelessWidget {
                 fontSize: 22,
                 fontWeight: FontWeight.w300,
                 color: colorScheme.primary),
+            headline4: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.primary),
+            subtitle1: TextStyle(
+                fontSize: 12, fontWeight: FontWeight.w300, color: Colors.grey),
             bodyText1: TextStyle(fontSize: 14.0)),
         primaryColor: colorScheme.primary,
         accentColor: colorScheme.secondary,
         backgroundColor: colorScheme.background,
         colorScheme: colorScheme,
       ),
-      home: CollectionPage(),
+      home: child,
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+    final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+
+    return FutureBuilder(
+        future: _initialization,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return buildAppContainer(
+                Text("Error: ${snapshot.error.toString()}"));
+          }
+
+          if (snapshot.connectionState == ConnectionState.done) {
+            return buildAppContainer(CollectionPage());
+          }
+
+          return buildAppContainer(LoadingPage());
+        });
   }
 }
