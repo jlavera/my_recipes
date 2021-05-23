@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_recipes/dtos/ingredientDTO.dart';
 
 class RecipeDTO {
   RecipeDTO(this.name, this.source, this.author, this.imageIds, this.tags,
@@ -9,7 +10,7 @@ class RecipeDTO {
   final String author;
   final List<String> imageIds;
   final List<String> tags;
-  final List<String> ingredients;
+  final List<IngredientDTO> ingredients;
   final List<String> steps;
 
   String getFullImageUrl(String imageId) =>
@@ -30,13 +31,19 @@ class RecipeDTO {
       return data.containsKey(key) ? data[key] : def;
     }
 
+    List<IngredientDTO> getIngredients() {
+      return (data['ingrs'] as List)
+          .map((ing) => IngredientDTO.fromJson(ing))
+          .toList();
+    }
+
     return RecipeDTO(
       getField("name", ""),
       getField("source", ""),
       getField("author", ""),
       List.from(getField("imageIds", <String>[])),
       List.from(getField("tags", <String>[])),
-      List.from(getField("ingredients", <String>[])),
+      getIngredients(),
       List.from(getField("steps", <String>[])),
     );
   }

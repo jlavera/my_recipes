@@ -31,15 +31,10 @@ class CollectionItem extends StatelessWidget {
                         ),
                     child: CachedNetworkImage(
                         fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                              height: 70,
-                              color: colorScheme.background,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 60, right: 60, top: 10, bottom: 10),
-                                child: CircularProgressIndicator(
-                                    backgroundColor: colorScheme.background),
-                              ),
+                        placeholder: (context, url) => Align(
+                              alignment: Alignment.center,
+                              child: CircularProgressIndicator(
+                                  backgroundColor: colorScheme.background),
                             ),
                         imageUrl: this.recipe.thumbnailUrl)),
               ),
