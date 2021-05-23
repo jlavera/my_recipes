@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_recipes/components/ingredientsList.dart';
+import 'package:my_recipes/components/notesList.dart';
 import 'package:my_recipes/components/recipeImages.dart';
 import 'package:my_recipes/components/stepsList.dart';
 import 'package:my_recipes/dtos/recipeDTO.dart';
@@ -67,6 +68,7 @@ class _RecipePageState extends State<RecipePage>
                   ),
                 )
               ]),
+              NotesList(this.widget.recipe),
               TabBar(
                 controller: _tabController,
                 indicatorColor: colorScheme.primary,

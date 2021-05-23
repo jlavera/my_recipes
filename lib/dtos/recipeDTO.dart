@@ -3,7 +3,7 @@ import 'package:my_recipes/dtos/ingredientDTO.dart';
 
 class RecipeDTO {
   RecipeDTO(this.name, this.source, this.author, this.imageIds, this.tags,
-      this.ingredients, this.steps);
+      this.ingredients, this.steps, this.time, this.difficulty);
 
   final String name;
   final String source;
@@ -12,6 +12,8 @@ class RecipeDTO {
   final List<String> tags;
   final List<IngredientDTO> ingredients;
   final List<String> steps;
+  final int time;
+  final String difficulty;
 
   String getFullImageUrl(String imageId) =>
       "https://firebasestorage.googleapis.com/v0/b/my-recipes-312600.appspot.com/o/$imageId?alt=media";
@@ -38,13 +40,14 @@ class RecipeDTO {
     }
 
     return RecipeDTO(
-      getField("name", ""),
-      getField("source", ""),
-      getField("author", ""),
-      List.from(getField("imageIds", <String>[])),
-      List.from(getField("tags", <String>[])),
-      getIngredients(),
-      List.from(getField("steps", <String>[])),
-    );
+        getField("name", ""),
+        getField("source", ""),
+        getField("author", ""),
+        List.from(getField("imageIds", <String>[])),
+        List.from(getField("tags", <String>[])),
+        getIngredients(),
+        List.from(getField("steps", <String>[])),
+        getField("time", 0),
+        getField("difficulty", "medium"));
   }
 }

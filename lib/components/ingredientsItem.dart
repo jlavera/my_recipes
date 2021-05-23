@@ -59,7 +59,7 @@ class IngredientsItem extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: Text(
                   this.ingredient.cleanUnit,
-                  style: localTheme.bodyText1,
+                  style: localTheme.bodyText1.copyWith(color: Colors.black),
                 ),
               ),
             )
