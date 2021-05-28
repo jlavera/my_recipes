@@ -27,9 +27,7 @@ class _RecipePageState extends State<RecipePage>
   }
 
   void openSource() async {
-    await canLaunch(this.widget.recipe.source)
-        ? await launch(this.widget.recipe.source)
-        : throw 'Could not launch ${this.widget.recipe.source}';
+    await launch(this.widget.recipe.source);
   }
 
   @override
